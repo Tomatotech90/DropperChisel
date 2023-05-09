@@ -1,68 +1,50 @@
 #!/bin/bash
 
-# Make sure to run this script with sudo
+# Check for root privileges
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
 
-# Download Chisel for Linux and Windows
+# Check for Python
+command -v python3 >/dev/null 2>&1 || { echo >&2 "Python 3 is required but it's not installed. Aborting."; exit 1; }
+
+echo "Downloading Chisel for Linux and Windows..."
 wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_linux_amd64.gz -O chisel_linux.gz
 wget https://github.com/jpillora/chisel/releases/download/v1.7.6/chisel_1.7.6_windows_amd64.gz -O chisel_windows.gz
 
-# Unzip the downloaded files
+echo "Unzipping the downloaded files..."
 gunzip chisel_linux.gz
 gunzip chisel_windows.gz
 
-# Make the Linux version executable
+# Rename the decompressed files to remove .gz extension
+mv chisel_1.7.6_linux_amd64 chisel_linux
+mv chisel_1.7.6_windows_amd64 chisel_windows
+
+echo "Making the Linux version executable..."
 chmod +x chisel_linux
 
-# Set up a Python Flask server
-# Assuming Python and Flask are already installed
+echo "Setting up a Python HTTP server..."
 mkdir static
 mv chisel_linux static/
 mv chisel_windows static/
 
-echo "
-from flask import Flask, send_from_directory, session, request, jsonify
-from flask_session import Session
-from werkzeug.exceptions import BadRequest
-from werkzeug.serving import run_simple
-import os
+echo "Starting the Python HTTP server..."
+cd static
+nohup python3 -m http.server 5000 > ../http.log 2>&1 &
+cd ..
+echo "Python HTTP server is up and running at http://localhost:5000"
 
-app = Flask(__name__, static_folder='static')
+# Wait for server to start
+sleep 10
 
-app.secret_key = 'supersecretkey'
-app.config['SESSION_TYPE'] = 'filesystem'
-Session(app)
+# Check if server is running
+if ! curl --output /dev/null --silent --head --fail http://localhost:5000
+then
+    echo "Python HTTP server didn't start correctly. Please check http.log for details."
+    exit 1
+fi
 
-@app.route('/files/<path:path>')
-def send_file(path):
-    session['downloaded'] = True
-    return send_from_directory('static', path)
-
-@app.route('/shutdown', methods=['POST'])
-def shutdown():
-    if session.get('downloaded'):
-        session.pop('downloaded')
-        shutdown_server()
-        return 'Server shutting down...'
-    else:
-        raise BadRequest()
-
-def shutdown_server():
-    os.kill(os.getpid(), signal.SIGINT)
-
-if __name__ == '__main__':
-    run_simple('0.0.0.0', 5000, app)
-" > server.py
-
-# Start the Python Flask server
-python3 server.py > flask.log 2>&1 &
-
-# Wait for the user to download the file and shut down the server
-while true; do
-    if curl -X POST http://localhost:5000/shutdown 2>/dev/null; then
-        break
-    fi
-    sleep 1
-done
-
-# Start the Chisel server on port 1337
-./chisel_linux server --port 1337 > chisel.log 2>&1 &
+echo "Starting the Chisel server on port 1337..."
+nohup ./static/chisel_linux server --port 1337 > chisel.log 2>&1 &
+echo "Chisel server is up and running at http://localhost:1337"
