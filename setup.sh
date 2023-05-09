@@ -55,10 +55,12 @@ echo "Shutting down Python HTTP server..."
 kill $(cat ../http.pid) && rm ../http.pid
 
 echo "Starting the Chisel server on port 1337..."
-nohup ./chisel_linux server --port 1337 > chisel.log 2>&1 &
-echo $! > chisel.pid
-echo "Chisel server is up and running at http://localhost:1337"
+./chisel_linux server --port 1337
 
+# Inform the user how to connect to the reverse shell
+echo "The Chisel server is now running. To interact with the reverse shell, you will need to open a new terminal window or tab and use a command like ssh or nc (netcat) to connect through the reverse tunnel provided by the Chisel server."
 # Inform the user how to kill the Chisel server
 echo "To shut down the Chisel server, run the following command:"
 echo "kill $(cat chisel.pid) && rm chisel.pid"
+# The script will now stop, and the Chisel server will run in the foreground.
+# The user can stop the Chisel server by pressing Ctrl+C in the terminal.
