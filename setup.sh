@@ -52,8 +52,13 @@ read -p "Press enter to continue once the file has been downloaded..."
 
 # Kill the HTTP server
 echo "Shutting down Python HTTP server..."
-kill $(cat http.pid) && rm http.pid
+kill $(cat ../http.pid) && rm ../http.pid
 
 echo "Starting the Chisel server on port 1337..."
-nohup ./static/chisel_linux server --port 1337 > chisel.log 2>&1 &
+nohup ./chisel_linux server --port 1337 > chisel.log 2>&1 &
+echo $! > chisel.pid
 echo "Chisel server is up and running at http://localhost:1337"
+
+# Inform the user how to kill the Chisel server
+echo "To shut down the Chisel server, run the following command:"
+echo "kill $(cat chisel.pid) && rm chisel.pid"
