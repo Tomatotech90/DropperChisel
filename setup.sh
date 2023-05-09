@@ -32,6 +32,7 @@ mv chisel_windows static/
 echo "Starting the Python HTTP server..."
 cd static
 nohup python3 -m http.server 5000 > ../http.log 2>&1 &
+echo $! > ../http.pid
 cd ..
 echo "Python HTTP server is up and running at http://localhost:5000"
 
@@ -44,6 +45,14 @@ then
     echo "Python HTTP server didn't start correctly. Please check http.log for details."
     exit 1
 fi
+
+# Wait for user to download the file
+echo "Waiting for user to download the file..."
+read -p "Press enter to continue once the file has been downloaded..."
+
+# Kill the HTTP server
+echo "Shutting down Python HTTP server..."
+kill $(cat http.pid) && rm http.pid
 
 echo "Starting the Chisel server on port 1337..."
 nohup ./static/chisel_linux server --port 1337 > chisel.log 2>&1 &
