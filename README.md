@@ -1,6 +1,6 @@
 # Chisel and Flask Server Setup Script
 
-This repository contains a bash script (`setup.sh`) that automates the process of downloading Chisel for Linux and Windows, setting up a Chisel server, and setting up a Flask server to serve the Chisel client files.
+This repository contains a bash script (`setup.sh`) that automates the process of downloading Chisel for Linux and Windows, setting up a Chisel server, and setting up a Python server to serve the Chisel client files.
 
 ## What is this script?
 
@@ -8,8 +8,8 @@ The script does the following:
 
 1. Downloads the Chisel client for Linux and Windows.
 2. Sets up a Chisel server running on port 1337.
-3. Sets up a Python Flask server running on port 5000. This server serves the Chisel client files and shuts down after a client has downloaded a file.
-4. Once the Flask server shuts down, the Chisel server is started.
+3. Sets up a Python  server running on port 5000. This server serves the Chisel client files and shuts down after a client has downloaded a file.
+4. Once the Python server shuts down, the Chisel server is started.
 
 ## Why is it useful?
 
