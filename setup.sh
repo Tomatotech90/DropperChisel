@@ -54,8 +54,16 @@ read -p "Press enter to continue once the file has been downloaded..."
 echo "Shutting down Python HTTP server..."
 kill $(cat ../http.pid) && rm ../http.pid
 
-echo "Starting the Chisel server on port 1337..."
-./chisel_linux server --port 1337
+# Ask the user if they want to enable reverse port forwarding
+read -p "Do you want to enable reverse port forwarding? (y/N): " reverse
+if [[ "$reverse" =~ ^([yY][eE][sS]|[yY])$ ]]
+then
+    echo "Starting the Chisel server on port 1337 with reverse port forwarding..."
+    ./chisel_linux server --port 1337 --reverse
+else
+    echo "Starting the Chisel server on port 1337..."
+    ./chisel_linux server --port 1337
+fi
 
 # Inform the user how to connect to the reverse shell
 echo "The Chisel server is now running. To interact with the reverse shell, you will need to open a new terminal window or tab and use a command like ssh or nc (netcat) to connect through the reverse tunnel provided by the Chisel server."
