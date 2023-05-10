@@ -17,19 +17,14 @@ This script can be useful in situations where you want to distribute the Chisel 
 
 ## How to run the script
 
-1. First, ensure that you have Python, Flask, and the `flask-session` package installed on your machine. You can install Flask and `flask-session` with pip:
 
-    ```bash
-    pip install flask flask-session
-    ```
-
-2. Make the script executable:
+1. Make the script executable:
 
     ```bash
     chmod +x setup.sh
     ```
 
-3. Run the script with sudo:
+2. Run the script with sudo:
 
     ```bash
     sudo ./setup.sh
